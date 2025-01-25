@@ -182,16 +182,64 @@ int main() {
     TodoList todoList;
     todoList.loadTasks();
 
-    todoList.addTask("Finish DSA project", "Work", "High", "2025-01-25");
-    todoList.addTask("Buy groceries", "Personal", "Medium", "2025-01-23");
+    int choice;
+    do {
+        cout << "\n--- To-Do List Menu ---\n";
+        cout << "1. Add Task\n";
+        cout << "2. Display Tasks\n";
+        cout << "3. Mark Task as Done\n";
+        cout << "4. Generate Task Summary\n";
+        cout << "5. Save Tasks\n";
+        cout << "6. Sort Tasks\n"; // New menu option
+        cout << "0. Exit\n";
+        cout << "Enter your choice: ";
+        cin >> choice;
+        cin.ignore(); // To handle the newline character after choice input
 
-    todoList.sortTasks();
-    todoList.displayTasks();
+        switch (choice) {
+            case 1: {
+                string description, category, priority, dueDate;
+                cout << "Enter task description: ";
+                getline(cin, description);
+                cout << "Enter task category: ";
+                getline(cin, category);
+                cout << "Enter task priority (High/Medium/Low): ";
+                getline(cin, priority);
+                cout << "Enter task due date (YYYY-MM-DD): ";
+                getline(cin, dueDate);
 
-    todoList.markTaskDone(2);
-
-    todoList.generateSummary();
-    todoList.saveTasks();
+                todoList.addTask(description, category, priority, dueDate);
+                cout << "Task added successfully.\n";
+                break;
+            }
+            case 2:
+                todoList.displayTasks();
+                break;
+            case 3: {
+                int taskId;
+                cout << "Enter task ID to mark as done: ";
+                cin >> taskId;
+                todoList.markTaskDone(taskId);
+                break;
+            }
+            case 4:
+                todoList.generateSummary();
+                break;
+            case 5:
+                todoList.saveTasks();
+                cout << "Tasks saved successfully.\n";
+                break;
+            case 6: // Sort tasks
+                todoList.sortTasks();
+                cout << "Tasks sorted successfully.\n";
+                break;
+            case 0:
+                cout << "Exiting...\n";
+                break;
+            default:
+                cout << "Invalid choice. Please try again.\n";
+        }
+    } while (choice != 0);
 
     return 0;
 }
