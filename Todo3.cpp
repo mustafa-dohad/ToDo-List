@@ -1,4 +1,4 @@
-#include <iostream>  
+#include<iostream>
 #include <fstream>   // File operations 
 #include <string>    // String operations 
 #include <iomanip>   // For setting output formatting like width
@@ -19,8 +19,8 @@ struct Task {
 };
 
 struct Action {
-    string type;           // Action ka type (like 'add', 'mark_done', etc.)
-    Task* task;            // Task jisme action perform kiya gaya
+    string type;           // Action type (like 'add', 'mark_done', etc.)
+    Task* task;            // Task in which actions are to be performed
     Action* next;          // Pointer to the next action (for undo/redo stack)
 
     // Constructor to initialize an Action
@@ -49,7 +49,7 @@ void popRedo();
 
 
 void saveTasks() {
-    ofstream file(filename);  // File open kar rahe hain to save tasks
+    ofstream file(filename);  // File open
     if (!file) {             
         cout << "Error saving tasks.\n"; 
         return;
@@ -58,7 +58,7 @@ void saveTasks() {
     Task* temp = head; 
     while (temp) {  
         file << temp->id << "," << temp->description << "," << temp->category << ","
-             << temp->priority << "," << temp->dueDate << "," << temp->status << "\n"; // Task details file mein save karna
+             << temp->priority << "," << temp->dueDate << "," << temp->status << "\n"; // Task details to save in file
         temp = temp->next; 
     }
     file.close(); 
@@ -74,11 +74,11 @@ void loadTasks() {
     }
 
     string line;
-    while (getline(file, line)) {  // Har line ko read karna
+    while (getline(file, line)) {  // Read every line
         int id;
         string description, category, priority, dueDate, status;
 
-        // Data ko extract karna from CSV format
+        // Data extract from CSV format
         id = stoi(line.substr(0, line.find(',')));  
         line.erase(0, line.find(',') + 1);  
         description = line.substr(0, line.find(','));
@@ -91,7 +91,7 @@ void loadTasks() {
         line.erase(0, line.find(',') + 1);
         status = line;
 
-        // New task create karna aur head mein add karna
+        // To create new tasks and add them to the head
         Task* newTask = new Task(id, description, category, priority, dueDate, status, head);
         head = newTask;
 
@@ -117,11 +117,11 @@ void addTask() {
     cout << "Due Date (YYYY-MM-DD): ";
     cin >> dueDate;  
 
-    // New task create karna aur usko linked list mein add karna
+    // Create new task and add it to the linked list
     Task* newTask = new Task(++taskCount, description, category, priority, dueDate, "Pending", head);
     head = newTask;
 
-    pushUndo("add", newTask);  // Undo stack mein add karna
+    pushUndo("add", newTask);  // add in undo stack
     cout << "Task added successfully!\n"; 
 }
 
@@ -137,8 +137,8 @@ void displayTasks() {
          << setw(10) << "Status" << "\n";
     cout << string(77, '-') << "\n";  // Formatting line
 
-    Task* temp = head;  // Head se start karna
-    while (temp) {  // Jab tak task ho
+    Task* temp = head;  
+    while (temp) {  
         cout << left << setw(5) << temp->id << setw(25) << temp->description 
              << setw(15) << temp->category << setw(10) << temp->priority 
              << setw(12) << temp->dueDate << setw(10) << temp->status << "\n";
@@ -149,9 +149,9 @@ void displayTasks() {
 
 // Function to sort tasks
 void sortTasks() {
-    if (!head || !head->next) return;  // Agar koi task ya usse kam task ho toh kuch na karen
+    if (!head || !head->next) return;  
 
-    bool swapped;  // Sorting ke liye flag
+    bool swapped;  // Sorting flag
     Task *ptr1;
     Task *lptr = nullptr;  // Last pointer
 
@@ -175,10 +175,10 @@ void sortTasks() {
                 swap(ptr1->status, nextTask->status);
                 swapped = true;  // Set swapped to true if any swap happens
             }
-            ptr1 = ptr1->next;  // Next task pe move karna
+            ptr1 = ptr1->next; 
         }
-        lptr = ptr1;  // Last task ko mark karna
-    } while (swapped);  // Jab tak koi swap ho raha ho
+        lptr = ptr1;  // Last task marking
+    } while (swapped);  
 }
 
 // Function to mark a task as done
@@ -188,14 +188,14 @@ void markTaskAsDone() {
     cin >> id;  // Task ID lena
 
     Task* temp = head;
-    while (temp) {  // Linked list mein task dhundhna
+    while (temp) {  
         if (temp->id == id) {
             temp->status = "Done"; 
-            pushUndo("mark_done", temp);  // Undo stack mein action push karna
+            pushUndo("mark_done", temp);  
             cout << "Task marked as done.\n";  
             return;
         }
-        temp = temp->next;  // Next task pe move karna
+        temp = temp->next;  
     }
     cout << "Task with ID " << id << " not found.\n";
 }
@@ -203,43 +203,43 @@ void markTaskAsDone() {
 // Function to push an action into the undo stack
 void pushUndo(const string& type, Task* task) {
     Action* newAction = new Action(type, task);  
-    newAction->next = undoStack;  // Undo stack mein add karna
-    undoStack = newAction;  // Stack ko update karna
+    newAction->next = undoStack;  
+    undoStack = newAction;  
 }
 
 // Function to push an action into the redo stack
 void pushRedo(const string& type, Task* task) {
     Action* newAction = new Action(type, task);  
-    newAction->next = redoStack;  // Redo stack mein add karna
-    redoStack = newAction;  // Stack ko update karna
+    newAction->next = redoStack;  
+    redoStack = newAction;  
 }
 
 // Function to pop an action from the undo stack
 void popUndo() {
-    if (!undoStack) {  // Agar undo stack khali ho
+    if (!undoStack) {
         cout << "No actions to undo.\n"; 
         return;
     }
 
-    Action* action = undoStack;  // Undo action ko pop karna
-    undoStack = undoStack->next;  // Stack ko update karna
+    Action* action = undoStack;  
+    undoStack = undoStack->next;  
 
-    if (action->type == "add") {  // Agar action type "add" ho toh
+    if (action->type == "add") {  // if action type is "add" 
         Task* temp = head;
-        if (temp == action->task) {  // Agar task head ho
-            head = temp->next;  // Head ko update karna
-            delete temp;  // Task ko delete karna
+        if (temp == action->task) { 
+            head = temp->next;  
+            delete temp;  
         } else {
             while (temp->next != action->task) {
-                temp = temp->next;  // Task ko dhundhna
+                temp = temp->next;  // Find task
             }
-            temp->next = temp->next->next;  // Next task ko update karna
-            delete action->task;  // Task ko delete karna
+            temp->next = temp->next->next;  // Next task update
+            delete action->task;  // Task deleting
         }
-        pushRedo("add", action->task);  // Redo stack mein action push karna
-    } else if (action->type == "mark_done") {  // Agar action type "mark_done" ho toh
-        action->task->status = "Pending";  // Task status ko "Pending" pe revert karna
-        pushRedo("mark_done", action->task);  // Redo stack mein action push karna
+        pushRedo("add", action->task); 
+    } else if (action->type == "mark_done") { 
+        action->task->status = "Pending"; 
+        pushRedo("mark_done", action->task);  
     }
 
     delete action; 
@@ -248,20 +248,20 @@ void popUndo() {
 
 // Function to pop an action from the redo stack
 void popRedo() {
-    if (!redoStack) {  // Agar redo stack khali ho
+    if (!redoStack) {  
         cout << "No actions to redo.\n"; 
         return;
     }
 
-    Action* action = redoStack;  // Redo action ko pop karna
-    redoStack = redoStack->next;  // Stack ko update karna
+    Action* action = redoStack;  
+    redoStack = redoStack->next; 
 
-    if (action->type == "add") {  // Agar action type "add" ho toh
+    if (action->type == "add") {  
         Task* temp = new Task(action->task->id, action->task->description, action->task->category,
                               action->task->priority, action->task->dueDate, action->task->status, head);
-        head = temp;  // Head ko update karna
-    } else if (action->type == "mark_done") {  // Agar action type "mark_done" ho toh
-        action->task->status = "Done";  // Task status ko "Done" karna
+        head = temp;  
+    } else if (action->type == "mark_done") {  
+        action->task->status = "Done";  
     }
 
     delete action;  
